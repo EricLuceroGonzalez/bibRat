@@ -84,6 +84,6 @@ class ArxivSource(HttpSource):
         return result
 
     def check(self) -> str:
-        xml = self._get(URL, {"search_query": "ti:review", "max_results": 0}).text
+        xml = self._get(URL, {"search_query": "ti:review", "max_results": 1}).text
         total = _t(ET.fromstring(xml).find("os:totalResults", NS))
         return f"arXiv OK ({total} resultados de prueba)"

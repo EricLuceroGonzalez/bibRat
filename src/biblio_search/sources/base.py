@@ -55,7 +55,7 @@ def _wait(state: RetryCallState) -> float:
     exc = state.outcome.exception() if state.outcome else None
     if isinstance(exc, TransientError) and exc.retry_after:
         return min(exc.retry_after, 60.0)
-    return wait_exponential_jitter(initial=2, max=30)(state)
+    return wait_exponential_jitter(initial=5, max=60)(state)
 
 
 class HttpSource:

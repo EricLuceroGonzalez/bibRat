@@ -1,0 +1,4 @@
+concepto,terminos,campo,operador
+tecnica,machine learning; deep learning; neural network*,title_abstract,AND
+dominio,radiology; medical imaging,title_abstract,AND
+exclusion,review; editorial,title,NOT

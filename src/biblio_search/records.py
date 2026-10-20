@@ -18,6 +18,10 @@ class Record:
     url: str | None = None
     doc_type: str | None = None
     sources: list[str] = field(default_factory=list)  # tras deduplicar
+    # Cribado (se conservan al fusionar búsquedas con ``merge``)
+    decision: str = ""
+    notes: str = ""
+    searches: list[str] = field(default_factory=list)  # carpetas de búsqueda de origen
 
     def __post_init__(self) -> None:
         if self.doi:

@@ -4,6 +4,8 @@ Comandos:
     translate TABLA             Muestra la consulta que se enviará a cada fuente.
     search TABLA [--out DIR]    Ejecuta la búsqueda y guarda CSV, BibTeX e informe.
     check-config                Comprueba credenciales y acceso a cada fuente.
+    merge [BÚSQUEDAS...]        Une varias búsquedas en un CSV/BibTeX sin duplicados.
+    check-seeds SEMILLAS [RUTA] Indica qué artículos semilla se encontraron.
 """
 
 from __future__ import annotations
@@ -11,16 +13,22 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from pydantic import ValidationError
 
 from biblio_search import __version__
 from biblio_search.config import get_settings
+from biblio_search.dedupe import deduplicate
 from biblio_search.logging_setup import setup_logging
+from biblio_search.merge import merge_results
 from biblio_search.query.table import TableError, load_table
 from biblio_search.query.translate import translate_all
+from biblio_search.records import Record
+from biblio_search.results_io import read_results, resolve_results
 from biblio_search.search import SOURCES, build_sources, default_out_dir, run_search
+from biblio_search.seeds import check_seeds, load_seeds
 from biblio_search.sources.base import SourceError, TransientError
 
 logger = logging.getLogger(__name__)
@@ -52,11 +60,91 @@ def _parser() -> argparse.ArgumentParser:
     s.add_argument("--max", type=int, help="máximo de resultados por fuente")
     c = sub.add_parser("check-config", help="comprobar acceso a las fuentes")
     c.add_argument("--sources", default=",".join(SOURCES))
+
+    m = sub.add_parser("merge", help="unir búsquedas eliminando duplicados")
+    m.add_argument(
+        "inputs",
+        nargs="*",
+        type=Path,
+        help="carpetas de búsqueda o results.csv (por defecto: searches/*)",
+    )
+    m.add_argument("--out", type=Path, help="carpeta de salida (por defecto merged/…)")
+
+    k = sub.add_parser("check-seeds", help="¿se encontraron los artículos semilla?")
+    k.add_argument("seeds", type=Path, help="archivo con un DOI o título por línea")
+    k.add_argument(
+        "inputs",
+        nargs="*",
+        type=Path,
+        help="búsqueda(s), results.csv o merged.csv (por defecto: searches/*)",
+    )
     return p
+
+
+def _load_records(inputs: list[Path]) -> list[Record]:
+    """Registros únicos de las búsquedas indicadas (o de todas en searches/)."""
+    records: list[Record] = []
+    for path in resolve_results(inputs):
+        label = path.parent.name if path.name == "results.csv" else path.stem
+        records.extend(read_results(path, label))
+    return deduplicate(records)[0]
+
+
+def _cmd_merge(args: argparse.Namespace) -> int:
+    csv_paths = resolve_results(args.inputs)
+    if not csv_paths:
+        print(
+            "No se encontró ningún results.csv (¿existe la carpeta searches/?)",
+            file=sys.stderr,
+        )
+        return 2
+    out_dir = args.out or Path("merged") / datetime.now().strftime("%Y-%m-%d_%H%M")
+    _, report = merge_results(csv_paths, out_dir)
+    for name, n in report.inputs:
+        print(f"  {n:>5}  {name}")
+    print(
+        f"\nEntrada: {report.total_in} · duplicados: {report.duplicates_removed} "
+        f"· únicos: {report.unique}"
+    )
+    if report.conflicts:
+        print(
+            f"⚠ {report.conflicts} artículos con decisiones de cribado distintas "
+            "(columna decision = CONFLICTO)"
+        )
+    print(f"Resultado en {out_dir}/ (merged.csv, merged.bib, merge_report.md)")
+    return 0
+
+
+def _cmd_check_seeds(args: argparse.Namespace) -> int:
+    seeds = load_seeds(args.seeds)
+    records = _load_records(args.inputs)
+    if not records:
+        print("No hay resultados que revisar.", file=sys.stderr)
+        return 2
+    report = check_seeds(seeds, records)
+    for seed, record in report.found:
+        print(f"✓ {seed.raw}\n    → {record.title[:90]}  [{', '.join(record.sources)}]")
+    for seed in report.missing:
+        print(f"✗ {seed.raw}")
+    total = len(seeds)
+    print(
+        f"\nEncontradas {len(report.found)} de {total} semillas "
+        f"({report.recall:.0%}) entre {len(records)} registros únicos."
+    )
+    if report.missing:
+        print(
+            "Revisa los artículos que faltan: ¿qué términos usan que tu tabla no tiene?"
+        )
+    return 0 if not report.missing else 1
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+
+    if args.command == "merge":
+        return _cmd_merge(args)
+    if args.command == "check-seeds":
+        return _cmd_check_seeds(args)
 
     if args.command == "translate":
         try:

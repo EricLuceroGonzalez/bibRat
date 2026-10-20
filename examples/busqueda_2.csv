@@ -1,0 +1,5 @@
+concepto,terminos,campo,operador
+tecnica,BRKGA; biased random-key genetic algorithm*; random-key genetic algorithm*,title_abstract,AND
+problema,scheduling; rostering; timetabling; workforce; crew; shift,title_abstract,AND
+dominio,air traffic; ATCO; ATC; shift; multi-objective; multiobjective; fatigue,all,AND
+exclusion,editorial,title,NOT

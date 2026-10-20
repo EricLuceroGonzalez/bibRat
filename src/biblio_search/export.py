@@ -19,6 +19,7 @@ CSV_COLUMNS = [
     "url",
     "doc_type",
     "sources",
+    "searches",
     "abstract",
     "decision",
     "notes",
@@ -45,9 +46,10 @@ def write_csv(records: list[Record], path: Path) -> None:
                     "url": r.url or "",
                     "doc_type": r.doc_type or "",
                     "sources": "; ".join(r.sources),
+                    "searches": "; ".join(r.searches),
                     "abstract": r.abstract or "",
-                    "decision": "",
-                    "notes": "",
+                    "decision": r.decision,
+                    "notes": r.notes,
                 }
             )
 

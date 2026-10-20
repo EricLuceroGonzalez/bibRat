@@ -24,13 +24,50 @@ def _keys(record: Record) -> list[str]:
 def _merge(base: Record, other: Record) -> None:
     """Completa en ``base`` los campos vacíos con los de ``other``."""
     for f in fields(Record):
-        if f.name in {"source", "source_id", "sources"}:
+        if f.name in {
+            "source",
+            "source_id",
+            "sources",
+            "searches",
+            "decision",
+            "notes",
+        }:
             continue
         if not getattr(base, f.name) and getattr(other, f.name):
             setattr(base, f.name, getattr(other, f.name))
     for src in other.sources:
         if src not in base.sources:
             base.sources.append(src)
+    for search in other.searches:
+        if search not in base.searches:
+            base.searches.append(search)
+    base.decision = _combine_decisions(base.decision, other.decision)
+    if other.notes and other.notes not in base.notes:
+        base.notes = f"{base.notes} | {other.notes}" if base.notes else other.notes
+
+
+CONFLICT = "CONFLICTO"
+
+
+def _combine_decisions(a: str, b: str) -> str:
+    """Une dos decisiones de cribado sin perder información.
+
+    Iguales (sin distinguir mayúsculas) o una vacía → se conserva la que hay.
+    Distintas → ``CONFLICTO: excluir | incluir`` para resolverlo a mano.
+    """
+    values: dict[str, str] = {}
+    for decision in (a, b):
+        decision = decision.strip()
+        if decision.startswith(f"{CONFLICT}:"):
+            parts = decision.removeprefix(f"{CONFLICT}:").split("|")
+        else:
+            parts = [decision]
+        for part in (p.strip() for p in parts):
+            if part:
+                values.setdefault(part.casefold(), part)
+    if len(values) <= 1:
+        return next(iter(values.values()), "")
+    return f"{CONFLICT}: " + " | ".join(sorted(values.values(), key=str.casefold))
 
 
 def deduplicate(records: list[Record]) -> tuple[list[Record], int]:

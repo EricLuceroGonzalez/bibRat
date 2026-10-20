@@ -1,0 +1,5 @@
+concepto,terminos,campo,operador
+tecnica,metaheuristic*;Metaheuristic;heuristic;genetic algorithm*;BRKGA;biased-random key,all,AND
+problema,Timetabling; staff rostering; personnel rostering; shift scheduling;crew scheduling; personnel scheduling; Workforce scheduling,all,AND
+dominio,air traffic; ATCO; ATC; shift; workload; fatigue; shift rotation,all,AND
+exclusion,editorial,title,NOT

@@ -28,3 +28,5 @@ diagrams:  ## Diagramas UML con pyreverse (requiere graphviz)
 clean:  ## Borra cachés y artefactos
 	find . -type d \( -name __pycache__ -o -name .pytest_cache -o -name .ruff_cache \) -prune -exec rm -rf {} +
 	rm -rf .coverage htmlcov dist build
+access:
+	uv run biblio-search check-config

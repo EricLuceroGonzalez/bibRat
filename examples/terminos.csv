@@ -1,4 +1,4 @@
 concepto,terminos,campo,operador
 tecnica,BRKGA; Biased random key genetic algorithm; Biased random genetic algorithm,title_abstract,AND
-dominio,timetabling; scheduling,title_abstract,AND
-exclusion,review; editorial,title,NOT
+dominio,timetabling; personnel scheduling; workforce scheduling; air traffic controller; nurse,title_abstract,AND
+exclusion,editorial,title,NOT

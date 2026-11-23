@@ -1,0 +1,4 @@
+concepto,terminos,campo,operador
+tecnica,,title_abstract,AND
+dominio,employee scheduling problem;staff rostering; workforce scheduling,title_abstract,AND
+exclusion,editorial;Conference Review,title,NOT

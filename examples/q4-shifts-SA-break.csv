@@ -1,0 +1,3 @@
+concepto,terminos,campo,operador
+problema,break scheduling;shift design;nurse rostering;nurse scheduling;physician scheduling;call center scheduling,title_abstract,AND
+tecnica,metaheuristic*;meta-heuristic*;genetic algorithm*;random key*;BRKGA;simulated annealing;variable neighborhood search;tabu search;memetic;matheuristic*;hyper-heuristic*,title_abstract,AND

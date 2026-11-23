@@ -1,0 +1,4 @@
+concepto,terminos,campo,operador
+tecnica,,title_abstract,AND
+dominio,,title_abstract,AND
+exclusion,editorial,title,NOT

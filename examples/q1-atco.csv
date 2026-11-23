@@ -1,0 +1,5 @@
+concepto,terminos,campo,operador
+dominio,air traffic control*;air traffic controller*;ATCO;ATCOs;air navigation service*;airspace sector*;sector configuration*;en-route sector*;sectorization,title_abstract,AND
+problema,roster*;shift scheduling;work-shift*;workshift*;shift design;staff scheduling;personnel scheduling;workforce scheduling;workforce planning;break scheduling;duty scheduling;tour scheduling;rest period*;work and rest;timetabl*,title_abstract,AND
+tecnica,,,AND
+exclusion,job shop;flow shop;aircraft landing;runway scheduling;flight scheduling;airline crew;crew pairing,title_abstract,NOT

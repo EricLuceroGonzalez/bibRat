@@ -1,0 +1,5 @@
+concepto,terminos,campo,operador
+tecnica,simulated annealing;genetic algorithm;BRKGA;biased random key*,title_abstract,AND
+problema,staff rostering; personnel rostering; shift scheduling;crew scheduling; personnel scheduling;Workforce scheduling,title_abstract,AND
+dominio,air traffic; ATCO; ATC; shift; workload; fatigue; shift rotation,title_abstract,AND
+exclusion,editorial; job-shop; flow-shop; Book Chapter,title_abstract,NOT
